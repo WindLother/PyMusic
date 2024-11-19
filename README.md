@@ -22,27 +22,38 @@ PyMusic é um bot de música para Discord, desenvolvido em Python, que permite t
    ```
 
 2. Crie e ative um ambiente virtual:
+   ```bash
    python3 -m venv venv
    source venv/bin/activate
+   ```
 
 3. Instale as dependências:
+   ```bash
    pip install -r requirements.txt
+   ```
 
 4. Crie um arquivo `.env` na raiz do projeto e adicione seu token do Discord:
+   ```bash
    DISCORD_TOKEN=seu_token_aqui
+   ```
 
 5. Certifique-se de que o FFmpeg está instalado no sistema:
+   ```bash
    sudo apt install ffmpeg
+   ```
 
 ## Uso
 
 Para iniciar o bot:
+```bash
 python bot.py
+```
 
 O bot escutará comandos com o prefixo `#`.
 
 ## Notas
 - **O arquivo `cookies.txt` contém informações sensíveis e NÃO deve ser enviado para o repositório. Ele é usado para autenticação no YouTube.**
+- Você pode gerar um arquivo `cookies.txt` com a extensão "get cookies.txt locally". Após instalar a extensão, entre na página do YouTube (com seu usuário logado) e utilize a extensão para gerar o arquivo.
 - O bot usa `yt-dlp` para buscar músicas no YouTube.
 
 ## Comandos Disponíveis
