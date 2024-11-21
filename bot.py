@@ -111,6 +111,7 @@ def get_song_info(video_url_or_id):
         'format': 'bestaudio/best',
         'quiet': True,
         'skip_download': True,
+        'default_search': 'ytsearch',  # Adicionado para resolver o problema
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'
                       ' Chrome/115.0.0.0 Safari/537.36',
         'cookiefile': cookiefile,
