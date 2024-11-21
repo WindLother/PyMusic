@@ -111,7 +111,7 @@ def get_song_info(video_url_or_id):
         'format': 'bestaudio/best',
         'quiet': True,
         'skip_download': True,
-        'default_search': 'ytsearch',  # Adicionado para resolver o problema
+        'default_search': 'ytsearch1',  # Alterado para garantir um único resultado
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'
                       ' Chrome/115.0.0.0 Safari/537.36',
         'cookiefile': cookiefile,
@@ -119,6 +119,9 @@ def get_song_info(video_url_or_id):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url_or_id, download=False)
+            # Verifica se 'entries' está em info e extrai o primeiro resultado
+            if 'entries' in info:
+                info = info['entries'][0]
             song = {
                 'url': info['url'],
                 'title': info['title'],
