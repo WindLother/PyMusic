@@ -47,31 +47,44 @@ class Music(commands.Cog):
         if guild_id not in self.queues:
             self.queues[guild_id] = []
 
+        # Busca as informações das músicas
+        songs = []
+        for url in song_urls:
+            song = await youtube.get_song_info_async(url)
+            if song:
+                songs.append(song)
+            else:
+                print(f'Erro ao obter informações da música para {url}')
+
         if ctx.voice_client.is_playing() or ctx.voice_client.is_paused():
-            self.queues[guild_id].extend(song_urls)
+            self.queues[guild_id].extend(songs)
             embed = discord.Embed(
                 title="Adicionado à Fila",
-                description=f"Adicionado {len(song_urls)} música(s) à fila.",
+                description=f"Adicionado {len(songs)} música(s) à fila.",
                 color=discord.Color.blue()
             )
             await ctx.send(embed=embed)
         else:
             # Toca a primeira música imediatamente
-            first_song_url = song_urls.pop(0)
-            await self.play_song(ctx, first_song_url)
-            # Adiciona as demais à fila
-            if song_urls:
-                self.queues[guild_id].extend(song_urls)
+            if songs:
+                first_song = songs.pop(0)
+                await self.play_song(ctx, first_song)
+                # Adiciona as demais à fila
+                if songs:
+                    self.queues[guild_id].extend(songs)
+            else:
+                embed = discord.Embed(
+                    title="Erro",
+                    description="Não foi possível obter informações das músicas.",
+                    color=discord.Color.red()
+                )
+                await ctx.send(embed=embed)
 
-    async def play_song(self, ctx, video_url_or_id):
+    async def play_song(self, ctx, song):
         if not ctx.voice_client or not ctx.voice_client.is_connected():
             await ctx.send("O bot não está conectado a um canal de voz.")
             return
 
-        song = await youtube.get_song_info_async(video_url_or_id)
-        if not song:
-            await ctx.send("Erro ao obter informações da música.")
-            return
         url = song['url']
         voice_client = ctx.voice_client
 
@@ -104,9 +117,9 @@ class Music(commands.Cog):
     async def check_queue(self, ctx):
         guild_id = ctx.guild.id
         if self.queues[guild_id]:
-            next_song_url = self.queues[guild_id].pop(0)
+            next_song = self.queues[guild_id].pop(0)
             if ctx.voice_client and ctx.voice_client.is_connected():
-                await self.play_song(ctx, next_song_url)
+                await self.play_song(ctx, next_song)
             else:
                 print('Voice client não está conectado em check_queue.')
         else:
@@ -174,13 +187,8 @@ class Music(commands.Cog):
         )
 
         description = ""
-        for idx, video_url_or_id in enumerate(self.queues[guild_id], start=1):
-            # Tenta obter informações da música do cache
-            song = youtube.song_info_cache.get(video_url_or_id)
-            if song:
-                description += f"{idx}. [{song['title']}]({song['webpage_url']})\n"
-            else:
-                description += f"{idx}. {video_url_or_id}\n"
+        for idx, song in enumerate(self.queues[guild_id], start=1):
+            description += f"{idx}. [{song['title']}]({song['webpage_url']})\n"
 
         embed.description = description
         await ctx.send(embed=embed)
